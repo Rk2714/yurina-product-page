@@ -67,22 +67,24 @@ function App() {
   const location = useLocation();
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <ScrollToTop />
       <CustomCursor />
       <CartDrawer />
       <div className="bg-noise" /> {/* Global Noise Overlay */}
       
       <Nav />
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<Home />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/success" element={<Success />} />
-        </Routes>
-      </AnimatePresence>
+      <main className="flex-grow">
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<Home />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/success" element={<Success />} />
+          </Routes>
+        </AnimatePresence>
+      </main>
       <Footer />
-    </>
+    </div>
   );
 }
 

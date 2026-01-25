@@ -126,19 +126,23 @@ export default function Home() {
               className={`${product.gridClass} block h-full`}
             >
               <TiltCard
-                className={`group relative overflow-hidden rounded-[2rem] bg-white shadow-xl shadow-gray-200/50 cursor-pointer h-full`}
+                className={`group relative overflow-hidden rounded-[2rem] bg-white shadow-xl shadow-gray-200/50 cursor-pointer h-full min-h-[300px] border border-gray-100`}
               >
                 <motion.div
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1, duration: 0.8 }}
-                  className="w-full h-full"
+                  className="w-full h-full relative"
                 >
                   <img 
                     src={product.image} 
                     alt={product.name}
                     className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[0.25,0.46,0.45,0.94] group-hover:scale-110"
+                    onError={(e) => {
+                      e.target.onerror = null; 
+                      e.target.src = "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&q=80&w=1000"; // Fallback image
+                    }}
                   />
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-500" />
                   
