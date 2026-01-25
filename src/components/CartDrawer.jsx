@@ -1,81 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight, ArrowLeft, CreditCard, Lock } from 'lucide-react';
+import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import CheckoutForm from './CheckoutForm';
 
-// Dummy Stripe Elements Component
-const PaymentForm = ({ onSubmit, isProcessing }) => {
-  return (
-    <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
-        <h3 className="font-bold text-gray-700 flex items-center gap-2 mb-2">
-          <CreditCard size={18} /> Payment Details
-        </h3>
-        
-        {/* Card Number */}
-        <div>
-          <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Card Number</label>
-          <div className="relative">
-            <input 
-              type="text" 
-              placeholder="4242 4242 4242 4242" 
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 font-mono text-sm focus:outline-none focus:border-leather focus:ring-1 focus:ring-leather transition-all"
-            />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1">
-               <div className="w-8 h-5 bg-gray-200 rounded-sm" />
-               <div className="w-8 h-5 bg-gray-200 rounded-sm" />
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          {/* Expiry */}
-          <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Expiry</label>
-            <input 
-              type="text" 
-              placeholder="MM / YY" 
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 font-mono text-sm focus:outline-none focus:border-leather focus:ring-1 focus:ring-leather transition-all"
-            />
-          </div>
-          {/* CVC */}
-          <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">CVC</label>
-            <div className="relative">
-              <input 
-                type="text" 
-                placeholder="123" 
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 font-mono text-sm focus:outline-none focus:border-leather focus:ring-1 focus:ring-leather transition-all"
-              />
-              <Lock size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <button
-        onClick={onSubmit}
-        disabled={isProcessing}
-        className="w-full bg-leather-dark text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-black transition-all disabled:opacity-70 group shadow-lg shadow-leather/20"
-      >
-        {isProcessing ? (
-          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-        ) : (
-          <>
-            Pay Now
-            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-          </>
-        )}
-      </button>
-      
-      <p className="text-center text-[10px] text-gray-400">
-        <Lock size={10} className="inline mr-1" />
-        Payments are secure and encrypted.
-      </p>
-    </div>
-  );
-};
+// Load Stripe with your Vercel Environment Variable
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 export default function CartDrawer() {
   const { 
@@ -90,27 +23,47 @@ export default function CartDrawer() {
   const navigate = useNavigate();
   
   const [step, setStep] = useState('cart'); // 'cart' | 'payment'
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [clientSecret, setClientSecret] = useState('');
 
   // Reset step when closing
   const closeDrawer = () => {
     setIsCartOpen(false);
-    setTimeout(() => setStep('cart'), 300);
+    setTimeout(() => {
+      setStep('cart');
+      setClientSecret('');
+    }, 300);
   };
 
   const handleProceedToPayment = () => {
-    setStep('payment');
+    // 1. Get ClientSecret from API
+    fetch('/api/create-payment-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: cartTotal }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setClientSecret(data.clientSecret);
+        setStep('payment');
+      })
+      .catch((err) => console.error('Payment intent error:', err));
   };
 
-  const handleFinalPayment = async () => {
-    setIsProcessing(true);
-    // Simulate Stripe processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsProcessing(false);
+  const handlePaymentSuccess = () => {
     closeDrawer();
     clearCart();
     navigate('/success');
+  };
+
+  // Stripe Elements Appearance
+  const appearance = {
+    theme: 'stripe',
+    variables: {
+      colorPrimary: '#1E3A8A', // Indigo Blue
+      colorBackground: '#ffffff',
+      colorText: '#1f2937',
+      borderRadius: '12px',
+    },
   };
 
   return (
@@ -233,9 +186,16 @@ export default function CartDrawer() {
                     </motion.div>
                   )}
 
-                  {/* Step 2: Payment Form */}
-                  {step === 'payment' && (
-                    <PaymentForm onSubmit={handleFinalPayment} isProcessing={isProcessing} />
+                  {/* Step 2: Stripe Payment Form */}
+                  {step === 'payment' && clientSecret && (
+                    <Elements options={{ clientSecret, appearance }} stripe={stripePromise}>
+                      <CheckoutForm amount={cartTotal} onSuccess={handlePaymentSuccess} />
+                    </Elements>
+                  )}
+                  {step === 'payment' && !clientSecret && (
+                    <div className="flex justify-center py-10">
+                      <div className="w-8 h-8 border-2 border-leather rounded-full animate-spin border-t-transparent"></div>
+                    </div>
                   )}
                 </>
               )}
@@ -251,7 +211,7 @@ export default function CartDrawer() {
                   </div>
                   <div className="flex justify-between text-sm text-gray-500">
                     <span>Shipping</span>
-                    <span>Calculated at next step</span>
+                    <span>Calculated at checkout</span>
                   </div>
                   <div className="flex justify-between text-lg font-bold text-leather-dark pt-3 border-t border-gray-200">
                     <span>Total</span>
