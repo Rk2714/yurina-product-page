@@ -3,8 +3,11 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import ProductDetail from './pages/ProductDetail';
 import Success from './pages/Success';
-import ScrollToTop from './components/ScrollToTop';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useCart } from './context/CartContext';
+import CartDrawer from './components/CartDrawer';
+import ScrollToTop from './components/ScrollToTop';
+import Footer from './components/Footer';
 
 // Custom Cursor Component
 function CustomCursor() {
@@ -33,11 +36,6 @@ function CustomCursor() {
     </>
   );
 }
-
-import { useCart } from './context/CartContext';
-import CartDrawer from './components/CartDrawer';
-import ScrollToTop from './components/ScrollToTop';
-import Footer from './components/Footer';
 
 // Simple Navigation Component
 function Nav() {
