@@ -17,8 +17,8 @@ export const products = [
       { user: 'E. Higa', rating: 5, text: 'ミンサー柄が可愛くて一目惚れしました。普段使いにちょうどいいサイズです。' },
       { user: 'S. Kinjo', rating: 5, text: 'プレゼント用に購入。意味のある柄なので喜ばれました。' }
     ],
-    // Provided Image URL
-    image: 'https://multimodal-client-uploads.s3.us-east-1.amazonaws.com/image-17256543-982c-4712-9844-484832584105.jpg', 
+    // Local Image in public/images
+    image: '/images/ryukyu-clutch.jpg', 
     gridClass: 'md:col-span-2 md:row-span-2', // Make it big feature
   },
   {
