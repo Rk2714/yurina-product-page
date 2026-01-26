@@ -88,15 +88,13 @@ export default function Home() {
               沖縄の伝統を、日常のポケットに。<br/>
               あなただけの「宝物」を見つけてください。
             </p>
-            <motion.a 
-              href="#shop"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+            <Link 
+              to="/collection"
               className="mt-12 group flex items-center gap-4 bg-white text-black px-10 py-5 rounded-full font-bold cursor-pointer hover:bg-leather hover:text-white transition-colors duration-500 shadow-2xl shadow-white/20"
             >
               <span className="uppercase tracking-widest text-xs">Enter Collection</span>
               <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform duration-300" />
-            </motion.a>
+            </Link>
           </motion.div>
         </div>
       </header>
@@ -113,9 +111,9 @@ export default function Home() {
             <span className="text-leather font-bold tracking-[0.3em] uppercase text-xs block mb-4">New Arrivals</span>
             <h2 className="text-6xl font-serif font-bold text-leather-dark">The Catalog</h2>
           </motion.div>
-          <a href="#shop" className="text-xs font-bold uppercase tracking-[0.2em] flex items-center gap-2 border-b border-gray-300 pb-2 hover:border-leather hover:text-leather transition-colors duration-300">
+          <Link to="/collection" className="text-xs font-bold uppercase tracking-[0.2em] flex items-center gap-2 border-b border-gray-300 pb-2 hover:border-leather hover:text-leather transition-colors duration-300">
             View All Items <ChevronRight size={14} />
-          </a>
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 auto-rows-[350px]">

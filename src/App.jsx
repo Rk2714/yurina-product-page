@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Link } from 'react-router-dom';
 import Home from './pages/Home';
 import ProductDetail from './pages/ProductDetail';
+import Collection from './pages/Collection'; // Added
 import Success from './pages/Success';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCart } from './context/CartContext';
@@ -47,8 +48,8 @@ function Nav() {
         <a href="/" className="text-2xl font-serif font-bold tracking-widest hover:opacity-70 transition-opacity">Oh!! Mine</a>
       </div>
       <div className="pointer-events-auto bg-white/5 backdrop-blur-sm border border-white/10 px-8 py-4 rounded-full flex gap-8 text-sm font-medium shadow-2xl">
-        <a href="/" className="hover:text-leather-light transition-colors tracking-widest uppercase text-xs">Collection</a>
-        <a href="#story" className="hover:text-leather-light transition-colors tracking-widest uppercase text-xs">Philosophy</a>
+        <Link to="/collection" className="hover:text-leather-light transition-colors tracking-widest uppercase text-xs">Collection</Link>
+        <a href="/#story" className="hover:text-leather-light transition-colors tracking-widest uppercase text-xs">Philosophy</a>
         <span className="text-white/20">|</span>
         <button 
           onClick={() => setIsCartOpen(true)}
@@ -76,6 +77,7 @@ function App() {
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<Home />} />
+            <Route path="/collection" element={<Collection />} /> {/* Added */}
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/success" element={<Success />} />
           </Routes>
