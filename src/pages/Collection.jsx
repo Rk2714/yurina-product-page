@@ -8,8 +8,8 @@ export default function Collection() {
   const [filter, setFilter] = useState('All');
   const [sort, setSort] = useState('newest'); // newest | price-asc | price-desc
 
-  // カテゴリを自動抽出（簡易ロジック）
-  const categories = ['All', 'Bag', 'Pouch', 'Case'];
+  // カテゴリ定義
+  const categories = ['All', 'Bag', 'Wallet', 'Case', 'Accessory'];
 
   // フィルタリングとソートのロジック
   const filteredProducts = useMemo(() => {
@@ -17,7 +17,7 @@ export default function Collection() {
 
     // Filter
     if (filter !== 'All') {
-      result = result.filter(p => p.name.includes(filter) || p.description.includes(filter));
+      result = result.filter(p => p.category === filter);
     }
 
     // Sort
@@ -54,10 +54,10 @@ export default function Collection() {
             <button
               key={cat}
               onClick={() => setFilter(cat)}
-              className={`px-4 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap flex-shrink-0 ${
                 filter === cat 
                   ? 'bg-leather text-white shadow-md' 
-                  : 'bg-white text-gray-500 hover:bg-gray-100'
+                  : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-200'
               }`}
             >
               {cat}
@@ -103,11 +103,15 @@ export default function Collection() {
                     src={product.image} 
                     alt={product.name}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    onError={(e) => {
+                      e.target.onerror = null; 
+                      e.target.src = "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&q=80&w=1000"; 
+                    }}
                   />
-                  {/* New Badge */}
+                  {/* Category Badge */}
                   <div className="absolute top-2 left-2">
                      <span className="bg-white/90 backdrop-blur text-[10px] font-bold px-2 py-1 rounded text-leather-dark uppercase tracking-wider">
-                       New
+                       {product.category}
                      </span>
                   </div>
                 </div>
